@@ -117,9 +117,17 @@ jobs:
           echo "" >> dist\SHA256SUMS.txt
           echo "Built from commit: $env:SOURCE_COMMIT" >> dist\SHA256SUMS.txt
 
+      - name: Detect prerelease tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $isPrerelease = $tag -match "-(test|nightly|alpha|beta|rc)\.?"
+          "IS_PRERELEASE=$($isPrerelease.ToString().ToLower())" >> $env:GITHUB_ENV
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          prerelease: ${{ env.IS_PRERELEASE }}
           files: |
             dist/neverlose.dll
             dist/injector.exe
