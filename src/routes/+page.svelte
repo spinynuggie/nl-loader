@@ -304,6 +304,7 @@
 
     try {
       await invoke('download_and_launch_version', { tag: versionToLaunch, configId: configIdToLaunch, appid });
+      // todo: wait until we see csgo.exe to determine if we're actually done
       finished = true;
       progress = 100;
       window.setTimeout(() => {
@@ -314,6 +315,7 @@
       launchPending = false;
       view = 'details';
       progress = 0;
+      await invoke('kill_background_processes');
     }
   }
 

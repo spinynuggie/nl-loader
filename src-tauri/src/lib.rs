@@ -447,6 +447,24 @@ fn spawn_server_hidden(
         .map_err(|error| format!("failed to launch {}: {error}", exe.display()))
 }
 
+#[tauri::command]
+#[cfg(windows)]
+fn kill_background_processes() -> Result<(), String> {
+    Command::new("taskkill")
+        .args(["/im", "injector.exe", "/f"])
+        .spawn()
+        .map(|_| ())
+        .map_err(|error| format!("failed to kill injector: {error}"))?;
+
+    Command::new("taskkill")
+        .args(["/im", "neverlose-server.exe", "/f"])
+        .spawn()
+        .map(|_| ())
+        .map_err(|error| format!("failed to kill neverlose server: {error}"))?;
+
+    Ok(())
+}
+
 #[cfg(windows)]
 fn restart_csgo(appid: i32) -> Result<(), String> {
     close_csgo_if_running()?;
@@ -809,7 +827,8 @@ pub fn run() {
             load_git_metadata,
             download_and_launch_version,
             minimize_main_window,
-            close_main_window
+            close_main_window,
+            kill_background_processes,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
