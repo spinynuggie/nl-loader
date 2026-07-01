@@ -1,4 +1,3 @@
-use sha2::digest::typenum::Or;
 use tauri::AppHandle;
 use tauri::Manager;
 use crate::error::LauncherError;
