@@ -71,8 +71,8 @@ pub fn find_game_install_path(game_name: &str) -> Option<PathBuf> {
 
     let steam_path = get_steam_install_path()?;
 
-    let check_path = |lib: &Path| -> Option<PathBuf> {
-        let full_path = lib.join("steamapps").join("common").join(game_name);
+    let check_path = |lib: &Path, name: &str| -> Option<PathBuf> {
+        let full_path = lib.join("steamapps").join("common").join(name);
         let exe_check = full_path.join("csgo.exe");
         if exe_check.exists() {
             Some(full_path)
@@ -81,18 +81,31 @@ pub fn find_game_install_path(game_name: &str) -> Option<PathBuf> {
         }
     };
 
-    if let Some(path) = check_path(&steam_path) {
+    let check_all_libs = |name: &str| -> Option<PathBuf> {
+        if let Some(path) = check_path(&steam_path, name) {
+            return Some(path);
+        }
+
+        let vdf_path = steam_path.join("steamapps").join("libraryfolders.vdf");
+        if let Ok(content) = fs::read_to_string(&vdf_path) {
+            if let Some(library_paths) = extract_library_paths(&content) {
+                for lib_path in library_paths {
+                    if let Some(path) = check_path(&lib_path, name) {
+                        return Some(path);
+                    }
+                }
+            }
+        }
+        None
+    };
+
+    if let Some(path) = check_all_libs(game_name) {
         return Some(path);
     }
 
-    let vdf_path = steam_path.join("steamapps").join("libraryfolders.vdf");
-    if let Ok(content) = fs::read_to_string(&vdf_path) {
-        if let Some(library_paths) = extract_library_paths(&content) {
-            for lib_path in library_paths {
-                if let Some(path) = check_path(&lib_path) {
-                    return Some(path);
-                }
-            }
+    if game_name == "Counter-Strike Global Offensive" {
+        if let Some(path) = check_all_libs("Counter-Strike Global Offensive 730") {
+            return Some(path);
         }
     }
 

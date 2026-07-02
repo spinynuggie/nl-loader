@@ -202,18 +202,10 @@ pub async fn download_and_launch_version(
         &cloud_dir,
         config_id,
     )?;
+    // Spawn the injector directly in headless mode (it will launch csgo.exe and handle steam_appid.txt)
+    let headless_choice = if appid == 730 { 2 } else { 1 };
+    spawn_injector_headless(&install_dir.join("injector.exe"), &install_dir, headless_choice, game_dir)?;
 
-    if auto_launch {
-        if is_legacy_version(&tag) {
-            steam::restart_csgo(appid)?;
-            spawn_hidden(&install_dir.join("injector.exe"), &install_dir)?;
-        } else {
-            let headless_choice = if appid == 730 { 2 } else { 1 };
-            spawn_injector_headless(&install_dir.join("injector.exe"), &install_dir, headless_choice, game_dir)?;
-        }
-    } else {
-        spawn_hidden(&install_dir.join("old_injector.exe"), &install_dir)?; // workaround im lazy as fuk to download visaul studio (its the old injector so make sure to bundle it ig)
-    }
     Ok(())
 }
 
