@@ -121,6 +121,7 @@ pub async fn download_and_launch_version(
     tag: String,
     config_id: Option<i32>,
     appid: i32,
+    auto_launch: bool,
 ) -> Result<(), LauncherError> {
     if tag.trim().is_empty() || tag == "Unavailable" {
         return Err(LauncherError::Validation("no release version is selected".to_string()));
@@ -177,7 +178,7 @@ pub async fn download_and_launch_version(
     download_asset(&client, &release, "neverlose.dll", &install_dir, &checksums).await?;
     download_asset(&client, &release, "neverlose-server.exe", &install_dir, &checksums).await?;
     download_asset(&client, &release, "injector.exe", &install_dir, &checksums).await?;
-
+    // download_asset(&client, &release, "old_injector.exe", &install_dir, &checksums).await?; // add third option to injector and nuke this line pls(put injector from 1.0.6 for time being pls)
     let game_folder_name = if appid == 730 {
         "Counter-Strike Global Offensive"
     } else {
@@ -201,10 +202,14 @@ pub async fn download_and_launch_version(
         &cloud_dir,
         config_id,
     )?;
+
+    if auto_launch {
     // Spawn the injector directly in headless mode (it will launch csgo.exe and handle steam_appid.txt)
     let headless_choice = if appid == 730 { 2 } else { 1 };
     spawn_injector_headless(&install_dir.join("injector.exe"), &install_dir, headless_choice, game_dir)?;
-
+    } else {
+        spawn_injector_headless(&install_dir.join("injector.exe"), &install_dir,3, game_dir)?;
+    };
     Ok(())
 }
 
