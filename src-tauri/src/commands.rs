@@ -4,6 +4,7 @@ use crate::error::LauncherError;
 use crate::steam;
 use crate::downloader;
 use crate::theme;
+use sysinfo::System;
 
 #[tauri::command]
 pub async fn load_launcher_theme() -> Result<theme::LauncherTheme, LauncherError> {
@@ -53,8 +54,9 @@ pub async fn download_and_launch_version(
     tag: String,
     config_id: Option<i32>,
     appid: i32,
+    auto_launch: bool,
 ) -> Result<(), LauncherError> {
-    downloader::download_and_launch_version(tag, config_id, appid).await
+    downloader::download_and_launch_version(tag, config_id, appid, auto_launch).await
 }
 
 #[tauri::command]
@@ -68,4 +70,36 @@ pub fn detect_installed_games() -> Result<steam::InstalledGames, LauncherError> 
         cs2_legacy_branch: steam::find_game_install_path("Counter-Strike Global Offensive").is_some(),
         csgo_standalone: steam::find_game_install_path("csgo legacy").is_some(),
     })
+}
+
+#[tauri::command]
+pub fn check_for_csgo() -> bool {
+    let mut sys = System::new_all();
+    sys.refresh_all();
+    
+    let x = sys.processes_by_exact_name(std::ffi::OsStr::new("csgo.exe"))
+        .next()
+        .is_some(); x // i fucking hate this shit i hope this works
+}
+
+#[tauri::command]
+pub fn is_legacy_version(tag: &str) -> bool {
+    let clean_tag = tag.trim_start_matches('v');
+    let parts: Vec<&str> = clean_tag.split('.').collect();
+    if parts.is_empty() {
+        return false;
+    }
+    if let Ok(major) = parts[0].parse::<i32>() {
+        if major < 1 {
+            return true;
+        }
+        if major == 1 && parts.len() > 1 {
+            if let Ok(minor) = parts[1].parse::<i32>() {
+                if minor < 1 {
+                    return true;
+                }
+            }
+        }
+    }
+    false
 }
