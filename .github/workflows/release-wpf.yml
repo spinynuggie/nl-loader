@@ -1,0 +1,48 @@
+name: Build WPF Launcher
+
+on:
+  push:
+    tags:
+      - "wpf-v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publish
+        run: dotnet publish -c Release
+        working-directory: src-wpf
+
+      - name: Collect executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item src-wpf\bin\Release\net10.0-windows\win-x64\publish\NeverloseLoader.exe dist\NeverloseLoader.exe
+          $hash = (Get-FileHash dist\NeverloseLoader.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  NeverloseLoader.exe" | Out-File -Encoding utf8 dist\SHA256SUMS.txt
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: "Neverlose WPF Launcher ${{ github.ref_name }}"
+          body: "WPF launcher built from ${{ github.sha }}."
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-test') || contains(github.ref_name, '-nightly') || contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-rc') }}
+          files: |
+            dist/NeverloseLoader.exe
+            dist/SHA256SUMS.txt

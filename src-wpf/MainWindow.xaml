@@ -1,0 +1,245 @@
+<ui:FluentWindow x:Class="NeverloseLoader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:local="clr-namespace:NeverloseLoader"
+        Title="Neverlose Launcher" 
+        Height="500" Width="680"
+        MinHeight="440" MinWidth="600"
+        WindowStartupLocation="CenterScreen"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica">
+
+    <ui:FluentWindow.Resources>
+        <SolidColorBrush x:Key="SystemControlPageTextBaseHighBrush" Color="{DynamicResource TextFillColorPrimary}"/>
+        <SolidColorBrush x:Key="SystemControlPageTextBaseMediumBrush" Color="{DynamicResource TextFillColorSecondary}"/>
+
+        <Style x:Key="BodyTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource SystemControlPageTextBaseHighBrush}"/>
+        </Style>
+
+        <Style x:Key="CaptionTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource SystemControlPageTextBaseMediumBrush}"/>
+        </Style>
+
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <Style TargetType="{x:Type ui:Button}" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <Style TargetType="{x:Type ui:CardControl}" BasedOn="{StaticResource {x:Type ui:CardControl}}">
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <Style TargetType="{x:Type ui:CardExpander}" BasedOn="{StaticResource {x:Type ui:CardExpander}}">
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <Style TargetType="{x:Type ui:NavigationViewItem}" BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}">
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar x:Name="AppTitleBar" Title="Neverlose Launcher" Grid.Row="0" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Sidebar -->
+            <ui:NavigationView x:Name="NavView"
+                               Grid.Column="0"
+                               PaneDisplayMode="Left"
+                               OpenPaneLength="160"
+                               IsBackButtonVisible="Collapsed"
+                               Background="Transparent"
+                               IsTopSeparatorVisible="False"
+                               IsPaneToggleVisible="True"
+                               SelectionChanged="NavView_SelectionChanged"
+                               Loaded="NavView_Loaded">
+
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem Content="Launcher" Icon="{ui:SymbolIcon Play24}" TargetPageTag="launcher" Tag="launcher" TargetPageType="{x:Type local:DummyPage}" />
+                </ui:NavigationView.MenuItems>
+
+                <!-- Profile widget in pane footer -->
+                <ui:NavigationView.PaneFooter>
+                    <Button x:Name="BtnProfileWidget"
+                            Click="BtnProfileWidget_Click"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Margin="0,0,0,8"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bg" CornerRadius="4" MinHeight="40" Cursor="Hand"
+                                        Background="Transparent">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" CornerRadius="12" Width="24" Height="24" ClipToBounds="True"
+                                                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                                BorderThickness="1" BorderBrush="{DynamicResource CardBorderBrush}"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Image x:Name="WidgetAvatar" Stretch="UniformToFill"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" x:Name="WidgetUsername" Text="Player"
+                                                   FontSize="14"
+                                                   HorizontalAlignment="Left"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource NavigationViewItemForeground}"/>
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bg" Property="Background" Value="{DynamicResource NavigationViewItemBackgroundPointerOver}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bg" Property="Background" Value="{DynamicResource NavigationViewItemBackgroundPressed}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </ui:NavigationView.PaneFooter>
+            </ui:NavigationView>
+
+            <!-- Content Area -->
+            <Grid x:Name="ContentFrame" Grid.Column="1" Margin="20,16,20,20">
+
+                <!-- Launcher View -->
+                <Grid x:Name="LauncherView" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,0,0,8">
+                        <StackPanel Margin="0,4,0,0">
+                            <ui:CardControl Icon="{ui:SymbolIcon Games24}" Margin="0,0,0,8">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Target Game" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Game to inject Neverlose into" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ComboBox x:Name="ComboGame" Width="160" SelectionChanged="ComboGame_SelectionChanged"/>
+                            </ui:CardControl>
+
+                            <ui:CardControl Icon="{ui:SymbolIcon History24}" Margin="0,0,0,8">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Version Tag" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Select the update payload version" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ComboBox x:Name="ComboVersion" Width="160" SelectionChanged="ComboVersion_SelectionChanged"/>
+                            </ui:CardControl>
+
+                            <ui:CardControl Icon="{ui:SymbolIcon Branch24}" Margin="0,0,0,8">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Nightly Builds" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Get early experimental features" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="ToggleNightly" Checked="Branch_Checked" Unchecked="Branch_Checked" VerticalAlignment="Center"/>
+                            </ui:CardControl>
+
+                            <ui:CardControl Icon="{ui:SymbolIcon Document24}" Margin="0,0,0,8">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Active Config" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Select your configuration profile" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ComboBox x:Name="ComboConfig" Width="160"/>
+                            </ui:CardControl>
+
+                            <ui:CardControl Icon="{ui:SymbolIcon History24}" Margin="0,0,0,8">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Changelog" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="TxtChangelogTitle" Text="Select a version to see release notes" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:Button Content="View Release Notes" Click="BtnViewChangelog_Click" Width="160"/>
+                            </ui:CardControl>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <ui:Card Grid.Row="1" Padding="12,10" Margin="0,12,0,0" VerticalAlignment="Bottom">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Status + progress -->
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <ui:ProgressRing x:Name="ProgressLaunchRing" Visibility="Collapsed" Width="14" Height="14" Margin="0,0,8,0" IsIndeterminate="True" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="TxtStatus" Text="Ready to launch" Style="{StaticResource BodyTextBlockStyle}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <ProgressBar x:Name="ProgressLaunch" Minimum="0" Maximum="100" Value="0" Height="4" BorderThickness="0"/>
+                            </StackPanel>
+
+                            <!-- Launch button -->
+                            <ui:Button Grid.Column="1"
+                                       x:Name="BtnLaunch"
+                                       Content="Launch"
+                                       Appearance="Primary"
+                                       Icon="{ui:SymbolIcon Play24}"
+                                       Padding="16,8"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Click="BtnLaunch_Click" />
+                        </Grid>
+                    </ui:Card>
+                </Grid>
+
+                <!-- Changelog Sub-page -->
+                <Grid x:Name="ChangelogView" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+                        <ui:Button x:Name="BtnBackToLauncher"
+                                   Appearance="Transparent"
+                                   Icon="{ui:SymbolIcon ArrowLeft24}"
+                                   Click="BtnBackToLauncher_Click"
+                                   Width="36" Height="32" Padding="0" Margin="0,0,12,0" Focusable="False"/>
+                        <TextBlock x:Name="TxtChangelogSubTitle" Text="Changelog" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{StaticResource SystemControlPageTextBaseHighBrush}"/>
+                    </StackPanel>
+                    
+                    <ui:Card Grid.Row="1" Padding="20,18" VerticalAlignment="Stretch">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <TextBlock x:Name="TxtChangelogContent" Text="Select a version to see its release notes." TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" Foreground="{StaticResource SystemControlPageTextBaseHighBrush}" LineHeight="20"/>
+                        </ScrollViewer>
+                    </ui:Card>
+                </Grid>
+
+            </Grid>
+        </Grid>
+
+        <!-- Hidden refs kept for code-behind compat -->
+        <TextBlock x:Name="TxtUsername" Visibility="Collapsed"/>
+        <Image x:Name="ImgAvatar" Visibility="Collapsed"/>
+
+        <ui:ContentDialogHost x:Name="RootContentDialogHost" Grid.Row="0" Grid.RowSpan="2" />
+    </Grid>
+</ui:FluentWindow>

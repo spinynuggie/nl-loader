@@ -12,6 +12,15 @@ vite.config.ts.timestamp-*
 src-tauri/target/
 src-tauri/gen/schemas/
 
+# .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+.idea/
+
 # Local environment
 .env
 .env.*
