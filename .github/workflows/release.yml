@@ -20,20 +20,17 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install frontend dependencies
-        run: bun install --frozen-lockfile
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
 
       - name: Build standalone executable
-        run: bun run tauri build --no-bundle
+        run: cargo build --release --locked
 
       - name: Collect executable
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item src-tauri\target\release\neverlosetauriofficial.exe dist\NeverloseLauncher.exe
+          Copy-Item target\release\neverlose-launcher.exe dist\NeverloseLauncher.exe
           $hash = (Get-FileHash dist\NeverloseLauncher.exe -Algorithm SHA256).Hash.ToLower()
           "$hash  NeverloseLauncher.exe" | Out-File -Encoding utf8 dist\SHA256SUMS.txt
 

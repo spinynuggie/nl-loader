@@ -1,16 +1,5 @@
-# Dependencies
-node_modules/
-
-# SvelteKit / Vite
-.svelte-kit/
-build/
-package/
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-
-# Tauri / Rust build output
-src-tauri/target/
-src-tauri/gen/schemas/
+# Dependencies / build output
+/target/
 
 # Local environment
 .env
@@ -19,11 +8,6 @@ src-tauri/gen/schemas/
 
 # Logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-bun-debug.log*
 
 # Editor / OS noise
 .DS_Store
